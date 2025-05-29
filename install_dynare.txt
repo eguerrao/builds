@@ -1,4 +1,5 @@
 wget https://www.dynare.org/release/source/dynare-6.3.tar.xz
+git clone https://git.dynare.org/Dynare/dynare.git
 
 1. Load the required modules
 Dynare has some requirements, which I was able to load using the module command. You might use module avail to see what is available on your cluster and ask the admin to install maybe a newer version of software. In may case, I asked the admins to install a newer version of bison and MATIO on the cluster. However, one can also install this locally without admin rights. You might want to check out the install instructions for Fedora, CentOS, RHEL.
