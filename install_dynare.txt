@@ -1,0 +1,59 @@
+1. Load the required modules
+Dynare has some requirements, which I was able to load using the module command. You might use module avail to see what is available on your cluster and ask the admin to install maybe a newer version of software. In may case, I asked the admins to install a newer version of bison and MATIO on the cluster. However, one can also install this locally without admin rights. You might want to check out the install instructions for Fedora, CentOS, RHEL.
+
+Anyways, let’s load the modules:
+
+module load foss zlib HDF5 Boost Bison Automake Autoconf flex GSL Doxygen MATIO SuiteSparse matlab
+Unfortunately, slicot and x13as are not prepackaged on CentOS or RHEL and need to be compiled from source, see below. Also I don’t need the packages for documentation on the cluster, so I’ll skip these. The Intel Fortran compiler also works for me and can be loaded by module load ifort.
+
+2. Directories
+I create a folder dynare in my home folder and also some subfolders for slicot and x13as.
+
+export DYNARE_DIR=/home/w/w_muts01/dynare
+mkdir -p $DYNARE_DIR
+mkdir -p $DYNARE_DIR/slicot/lib
+mkdir -p $DYNARE_DIR/x13as
+mkdir -p ~/.local/bin
+Of course you need to find out the directory of MATLAB by e.g. running
+
+whereis matlab
+# matlab: /Applic.ZIV/Matlab/R2020b/bin/matlab
+So the directory is /Applic.ZIV/Matlab/R2020b
+
+3. Compile slicot
+Compile slicot from source and put it into $DYNARE_DIR/slicot/lib/:
+
+cd $DYNARE_DIR/slicot
+wget https://deb.debian.org/debian/pool/main/s/slicot/slicot_5.0+20101122.orig.tar.gz
+tar xf slicot_5.0+20101122.orig.tar.gz
+cd slicot-5.0+20101122
+make FORTRAN=gfortran OPTS="-O2 -fPIC -fdefault-integer-8" LOADER=gfortran lib
+cp slicot.a $DYNARE_DIR/slicot/lib/libslicot64_pic.a
+4. Compile x13as
+Compile x13as from source and put it into $HOME/.local/bin:
+
+cd $DYNARE_DIR/x13as
+wget https://www.census.gov/ts/x13as/unix/x13assrc_V1.1_B39.tar.gz
+tar xf x13assrc_V1.1_B39.tar.gz
+sed -i "s|-static| |" makefile.gf # this removes '-static' in the makefile.gf
+make -f makefile.gf FFLAGS="-O2 -std=legacy" PROGRAM=x13as
+ln -s $DYNARE_DIR/x13as/x13as ~/.local/bin
+Check whether ~/.local/bin is on your PATH by running echo $PATH, otherwise add it.
+
+5. Compile dynare
+Stable version
+This will compile the stable 4.6 version of dynare:
+
+git clone --recurse-submodules --single-branch --branch 4.6 https://git.dynare.org/Dynare/dynare.git $DYNARE_DIR/stable-4.6
+cd stable-4.6
+autoreconf -si
+./configure --with-matlab=/Applic.ZIV/Matlab/R2020b --disable-octave --disable-doc --with-slicot=$DYNARE_DIR/slicot
+make -j20
+Unstable version
+This will compile the unstable version of dynare:
+
+git clone --recurse-submodules --single-branch --branch master https://git.dynare.org/Dynare/dynare.git $DYNARE_DIR/unstable
+cd unstable
+autoreconf -si
+./configure --with-matlab=/Applic.ZIV/Matlab/R2020b --disable-octave --disable-doc --with-slicot=$DYNARE_DIR/slicot
+make -j20
