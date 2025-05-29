@@ -60,3 +60,6 @@ cd unstable
 autoreconf -si
 ./configure --with-matlab=/Applic.ZIV/Matlab/R2020b --disable-octave --disable-doc --with-slicot=$DYNARE_DIR/slicot
 make -j20
+
+#EB
+https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.gz
