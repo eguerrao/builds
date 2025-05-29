@@ -63,3 +63,4 @@ make -j20
 
 #EB
 https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.gz
+https://github.com/SLICOT/SLICOT-Reference.git
